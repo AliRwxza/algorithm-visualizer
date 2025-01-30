@@ -1,0 +1,220 @@
+import React, { useState, useRef } from "react";
+
+function AlgorithmVisualizer() {
+  const [array, setArray] = useState([]);
+  const [sorting, setSorting] = useState(false);
+  const isCancelled = useRef(false);
+
+  let bars = document.getElementsByClassName("bar");
+
+  const resetBarColors = () => {
+    for (let idx = 0; idx < array.length; idx++) {
+      bars[idx].style.backgroundColor = "teal";
+    }
+  };
+
+  const generateArray = () => {
+    const randomArray = Array.from(
+      { length: 128 },
+      () => Math.floor(Math.random() * 400) + 10
+    );
+    resetBarColors();
+    setArray(randomArray);
+  };
+
+  const bubbleSort = async () => {
+    setSorting(true);
+    isCancelled.current = false;
+    let arr = [...array];
+    let n = arr.length;
+
+    for (let i = 0; i < n - 1; i++) {
+      for (let j = 0; j < n - i - 1; j++) {
+        if (isCancelled.current) {
+          console.log("Sorting stopped");
+          setSorting(false);
+          return;
+        }
+
+        let bars = document.getElementsByClassName("bar");
+        bars[j].style.backgroundColor = "red";
+        bars[j + 1].style.backgroundColor = "red";
+
+        await new Promise((resolve) => setTimeout(resolve, 2));
+
+        if (arr[j] > arr[j + 1]) {
+          let temp = arr[j];
+          arr[j] = arr[j + 1];
+          arr[j + 1] = temp;
+
+          setArray([...arr]);
+        }
+
+        bars[j].style.backgroundColor = "teal";
+        bars[j + 1].style.backgroundColor = "teal";
+      }
+    }
+
+    setSorting(false);
+  };
+
+  const merge = async (arr, left, mid, right) => {
+    let temp = [...arr];
+    let i = left;
+    let j = mid;
+    let k = left;
+
+    let bars = document.getElementsByClassName("bar");
+    while (i < mid && j < right) {
+      if (isCancelled.current) {
+        console.log("Sorting stopped");
+        setSorting(false);
+        return;
+      }
+      if (temp[i] < temp[j]) {
+        arr[k] = temp[i];
+        bars[i].style.backgroundColor = "red";
+        setArray([...arr]);
+
+        await new Promise((resolve) => setTimeout(resolve, 10));
+
+        bars[i].style.backgroundColor = "teal";
+
+        i++;
+      } else {
+        arr[k] = temp[j];
+        bars[j].style.backgroundColor = "red";
+        setArray([...arr]);
+
+        await new Promise((resolve) => setTimeout(resolve, 10));
+
+        bars[j].style.backgroundColor = "teal";
+
+        j++;
+      }
+      k++;
+    }
+
+    while (i < mid) {
+      if (isCancelled.current) {
+        console.log("Sorting stopped");
+        setSorting(false);
+        return;
+      }
+      arr[k] = temp[i];
+      bars[i].style.backgroundColor = "red";
+      setArray([...arr]);
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      bars[i].style.backgroundColor = "teal";
+
+      i++;
+      k++;
+    }
+
+    while (j < right) {
+      if (isCancelled.current) {
+        console.log("Sorting stopped");
+        setSorting(false);
+        return;
+      }
+      arr[k] = temp[j];
+
+      bars[j].style.backgroundColor = "red";
+      setArray([...arr]);
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      bars[j].style.backgroundColor = "teal";
+
+      j++;
+      k++;
+    }
+
+    // setArray([...arr]);
+
+    // let bars = document.getElementsByClassName("bar");
+    // for (let idx = left; idx < right; idx++) {
+    //   bars[idx].style.backgroundColor = "red";
+    //   await new Promise((resolve) => setTimeout(resolve, 10));
+    //   bars[idx].style.backgroundColor = "teal";
+    // }
+  };
+
+  const mergeSortHelper = async (arr, left, right) => {
+    if (right - left <= 1) return;
+
+    let mid = left + Math.floor((right - left) / 2);
+    await mergeSortHelper(arr, left, mid);
+    await mergeSortHelper(arr, mid, right);
+    await merge(arr, left, mid, right);
+  };
+
+  const mergeSort = async () => {
+    setSorting(true);
+    isCancelled.current = false;
+
+    let arr = [...array];
+    await mergeSortHelper(arr, 0, arr.length);
+
+    setSorting(false);
+  };
+
+  const stopSorting = () => {
+    isCancelled.current = true;
+    setSorting(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-4 w-screen">
+      <h1 className="text-3xl font-bold mb-4">Sorting Visualizer</h1>
+
+      <div className="flex items-end gap-[2px] h-96 my-10">
+        {array.map((value, index) => (
+          <div
+            key={index}
+            className="bar bg-teal-500"
+            style={{
+              width: "4px",
+              height: `${value}px`,
+            }}
+          ></div>
+        ))}
+      </div>
+
+      <div className="flex gap-4 mb-4">
+        <button
+          onClick={generateArray}
+          disabled={sorting}
+          className="px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 disabled:bg-gray-500"
+        >
+          Generate Array
+        </button>
+        <button
+          onClick={bubbleSort}
+          disabled={sorting}
+          className="px-4 py-2 bg-green-500 rounded hover:bg-green-600 disabled:bg-gray-500"
+        >
+          Bubble Sort
+        </button>
+        <button
+          onClick={mergeSort}
+          disabled={sorting}
+          className="px-4 py-2 bg-green-500 rounded hover:bg-green-600 disabled:bg-gray-500"
+        >
+          Merge Sort
+        </button>
+        <button
+          onClick={stopSorting}
+          disabled={!sorting}
+          className="px-4 py-2 bg-red-500 rounded hover:bg-red-600 disabled:bg-gray-500"
+        >
+          Stop
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default AlgorithmVisualizer;
