@@ -2,9 +2,10 @@ import React, { useState, useRef } from "react";
 
 const BASE_COLOR = "rgb(20 184 166)";
 const DEFAULT_COLOR = "teal";
-// const SECONDARY_COLOR = "red";
-const SECONDARY_COLOR = "purple";
-const NEW_ITEM_COLOR = "rgba(0, 0, 128, 0.5)";
+const SECONDARY_COLOR = "red";
+// const SECONDARY_COLOR = "purple";
+// const MIN_INDEX = "rgba(0, 0, 128, 0.5)";
+const MIN_INDEX = "purple";
 const INSERTED_ITEM_COLOR = "purple";
 
 const TIME_DELAY = 20; // ms
@@ -267,6 +268,44 @@ function AlgorithmVisualizer() {
     resetBarColors();
   };
 
+  const selectionSort = async () => {
+    setSorting(true);
+    isCancelled.current = false;
+
+    let arr = [...array];
+    const bars = document.getElementsByClassName("bar");
+
+    for (let i = 0; i < arr.length; i++) {
+      let minIndex = i;
+
+      for (let j = i + 1; j < arr.length; j++) {
+        if (isCancelled.current) break;
+
+        bars[j].style.backgroundColor = SECONDARY_COLOR;
+        bars[minIndex].style.backgroundColor = MIN_INDEX;
+
+        await new Promise((resolve) => setTimeout(resolve, TIME_DELAY));
+
+        if (arr[j] < arr[minIndex]) {
+          bars[minIndex].style.backgroundColor = DEFAULT_COLOR;
+          minIndex = j;
+        } else {
+          bars[j].style.backgroundColor = DEFAULT_COLOR;
+        }
+      }
+
+      if (minIndex !== i) {
+        bars[minIndex].style.backgroundColor = DEFAULT_COLOR;
+        const temp = arr[i];
+        arr[i] = arr[minIndex];
+        arr[minIndex] = temp;
+
+        setArray([...arr]);
+      }
+    }
+    setSorting(false);
+  };
+
   const stopSorting = () => {
     isCancelled.current = true;
     setSorting(false);
@@ -305,6 +344,13 @@ function AlgorithmVisualizer() {
           className="px-4 py-2 bg-green-500 rounded hover:bg-green-600 disabled:bg-gray-500"
         >
           Bubble Sort
+        </button>
+        <button
+          onClick={selectionSort}
+          disabled={sorting}
+          className="px-4 py-2 bg-green-500 rounded hover:bg-green-600 disabled:bg-gray-500"
+        >
+          Selection Sort
         </button>
         <button
           onClick={mergeSort}

@@ -3,10 +3,5 @@
 }
 
 .new-arr-item {
-  background-color: rgba(
-    0,
-    0,
-    128,
-    0.5
-  ) !important; /* Dark blue with 50% opacity */
+  background-color: rgba(0, 0, 128, 1) !important;
 }
