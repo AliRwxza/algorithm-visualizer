@@ -7,6 +7,7 @@ const SECONDARY_COLOR = "red";
 function AlgorithmVisualizer() {
   const [array, setArray] = useState([]);
   const [sorting, setSorting] = useState(false);
+  const [time, setTime] = useState(null);
   const isCancelled = useRef(false);
   let count = 0;
 
@@ -28,6 +29,7 @@ function AlgorithmVisualizer() {
   };
 
   const bubbleSort = async () => {
+    const start_time = Date.now();
     setSorting(true);
     isCancelled.current = false;
     let arr = [...array];
@@ -59,7 +61,7 @@ function AlgorithmVisualizer() {
         bars[j + 1].style.backgroundColor = DEFAULT_COLOR;
       }
     }
-
+    const time_elapsed = (Date.now() - start_time) / 1000;
     setSorting(false);
   };
 
@@ -85,7 +87,7 @@ function AlgorithmVisualizer() {
         arr[k] = temp[i];
         setArray([...arr]);
 
-        await new Promise((resolve) => setTimeout(resolve, 20));
+        await new Promise((resolve) => setTimeout(resolve, 2));
 
         bars[i].style.backgroundColor = DEFAULT_COLOR;
 
@@ -99,7 +101,7 @@ function AlgorithmVisualizer() {
         arr[k] = temp[j];
         setArray([...arr]);
 
-        await new Promise((resolve) => setTimeout(resolve, 20));
+        await new Promise((resolve) => setTimeout(resolve, 2));
 
         bars[j].style.backgroundColor = DEFAULT_COLOR;
 
@@ -180,7 +182,10 @@ function AlgorithmVisualizer() {
     isCancelled.current = false;
 
     let arr = [...array];
+    const start_time = Date.now();
     await mergeSortHelper(arr, 0, arr.length);
+    const time_elapsed = (Date.now() - start_time) / 1000;
+    setTime(time_elapsed);
 
     setSorting(false);
   };
@@ -250,6 +255,8 @@ function AlgorithmVisualizer() {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-4 w-screen">
       <h1 className="text-3xl font-bold mb-4">Sorting Visualizer</h1>
+
+      <div className="text-xl">{time} s</div>
 
       <div className="flex items-end gap-[2px] h-96 my-10">
         {array.map((value, index) => (
