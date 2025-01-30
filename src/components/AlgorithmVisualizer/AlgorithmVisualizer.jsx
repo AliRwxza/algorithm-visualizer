@@ -157,15 +157,6 @@ function AlgorithmVisualizer() {
       k++;
       count--;
     }
-
-    // setArray([...arr]);
-
-    // let bars = document.getElementsByClassName("bar");
-    // for (let idx = left; idx < right; idx++) {
-    //   bars[idx].style.backgroundColor = SECONDARY_COLOR;
-    //   await new Promise((resolve) => setTimeout(resolve, 10));
-    //   bars[idx].style.backgroundColor = DEFAULT_COLOR;
-    // }
   };
 
   const mergeSortHelper = async (arr, left, right) => {
@@ -194,11 +185,15 @@ function AlgorithmVisualizer() {
     setSorting(true);
     isCancelled.current = false;
 
+    const start_time = Date.now();
+
     let arr = [...array];
     await quickSortHelper(arr, 0, array.length - 1);
 
     // setArray(arr);
     // console.log(arr);
+
+    setTime((Date.now() - start_time) / 1000);
 
     setSorting(false);
   };
@@ -256,7 +251,7 @@ function AlgorithmVisualizer() {
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-4 w-screen">
       <h1 className="text-3xl font-bold mb-4">Sorting Visualizer</h1>
 
-      <div className="text-xl">{time} s</div>
+      <div className="text-xl">{`${time ? `${time} s` : ""}`}</div>
 
       <div className="flex items-end gap-[2px] h-96 my-10">
         {array.map((value, index) => (
