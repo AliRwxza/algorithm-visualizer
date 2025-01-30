@@ -1,15 +1,20 @@
 import React, { useState, useRef } from "react";
 
+const BASE_COLOR = "rgb(20 184 166)";
+const DEFAULT_COLOR = "teal";
+const SECONDARY_COLOR = "red";
+
 function AlgorithmVisualizer() {
   const [array, setArray] = useState([]);
   const [sorting, setSorting] = useState(false);
   const isCancelled = useRef(false);
+  let count = 0;
 
   let bars = document.getElementsByClassName("bar");
 
   const resetBarColors = () => {
     for (let idx = 0; idx < array.length; idx++) {
-      bars[idx].style.backgroundColor = "teal";
+      bars[idx].style.backgroundColor = BASE_COLOR;
     }
   };
 
@@ -18,8 +23,8 @@ function AlgorithmVisualizer() {
       { length: 128 },
       () => Math.floor(Math.random() * 400) + 10
     );
-    resetBarColors();
     setArray(randomArray);
+    resetBarColors();
   };
 
   const bubbleSort = async () => {
@@ -37,8 +42,8 @@ function AlgorithmVisualizer() {
         }
 
         let bars = document.getElementsByClassName("bar");
-        bars[j].style.backgroundColor = "red";
-        bars[j + 1].style.backgroundColor = "red";
+        bars[j].style.backgroundColor = SECONDARY_COLOR;
+        bars[j + 1].style.backgroundColor = SECONDARY_COLOR;
 
         await new Promise((resolve) => setTimeout(resolve, 2));
 
@@ -50,8 +55,8 @@ function AlgorithmVisualizer() {
           setArray([...arr]);
         }
 
-        bars[j].style.backgroundColor = "teal";
-        bars[j + 1].style.backgroundColor = "teal";
+        bars[j].style.backgroundColor = DEFAULT_COLOR;
+        bars[j + 1].style.backgroundColor = DEFAULT_COLOR;
       }
     }
 
@@ -71,74 +76,93 @@ function AlgorithmVisualizer() {
         setSorting(false);
         return;
       }
+
       if (temp[i] < temp[j]) {
+        while (count > 0);
+        count++;
+
+        bars[i].style.backgroundColor = SECONDARY_COLOR;
         arr[k] = temp[i];
-        bars[i].style.backgroundColor = "red";
         setArray([...arr]);
 
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 20));
 
-        bars[i].style.backgroundColor = "teal";
+        bars[i].style.backgroundColor = DEFAULT_COLOR;
 
         i++;
+        count--;
       } else {
+        while (count > 0);
+        count++;
+
+        bars[j].style.backgroundColor = SECONDARY_COLOR;
         arr[k] = temp[j];
-        bars[j].style.backgroundColor = "red";
         setArray([...arr]);
 
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 20));
 
-        bars[j].style.backgroundColor = "teal";
+        bars[j].style.backgroundColor = DEFAULT_COLOR;
 
         j++;
+        count--;
       }
       k++;
     }
 
     while (i < mid) {
+      while (count > 0);
+      count++;
+
       if (isCancelled.current) {
         console.log("Sorting stopped");
         setSorting(false);
         return;
       }
+
+      // bars[i].style.backgroundColor = SECONDARY_COLOR;
       arr[k] = temp[i];
-      bars[i].style.backgroundColor = "red";
       setArray([...arr]);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      bars[i].style.backgroundColor = "teal";
+      bars[i].style.backgroundColor = DEFAULT_COLOR;
 
       i++;
       k++;
+      count--;
     }
 
     while (j < right) {
+      while (count > 0);
+      count++;
+
       if (isCancelled.current) {
         console.log("Sorting stopped");
         setSorting(false);
         return;
       }
+
       arr[k] = temp[j];
 
-      bars[j].style.backgroundColor = "red";
+      // bars[j].style.backgroundColor = SECONDARY_COLOR;
       setArray([...arr]);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      bars[j].style.backgroundColor = "teal";
+      bars[j].style.backgroundColor = DEFAULT_COLOR;
 
       j++;
       k++;
+      count--;
     }
 
     // setArray([...arr]);
 
     // let bars = document.getElementsByClassName("bar");
     // for (let idx = left; idx < right; idx++) {
-    //   bars[idx].style.backgroundColor = "red";
+    //   bars[idx].style.backgroundColor = SECONDARY_COLOR;
     //   await new Promise((resolve) => setTimeout(resolve, 10));
-    //   bars[idx].style.backgroundColor = "teal";
+    //   bars[idx].style.backgroundColor = DEFAULT_COLOR;
     // }
   };
 
