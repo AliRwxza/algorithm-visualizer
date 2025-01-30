@@ -190,6 +190,63 @@ function AlgorithmVisualizer() {
     setSorting(false);
   };
 
+  const quickSort = async () => {
+    setSorting(true);
+    isCancelled.current = false;
+
+    let arr = [...array];
+    await quickSortHelper(arr, 0, array.length - 1);
+
+    // setArray(arr);
+    // console.log(arr);
+
+    setSorting(false);
+  };
+
+  const quickSortHelper = async (arr, left, right) => {
+    if (left >= right) return;
+    if (isCancelled.current) return;
+
+    const pivot = arr[Math.floor(Math.random() * (right - left + 1)) + left];
+    // const pivot = arr[Math.floor((left + right) / 2)];
+
+    const index = await partition(arr, left, right, pivot);
+    await quickSortHelper(arr, left, index - 1);
+    await quickSortHelper(arr, index, right);
+  };
+
+  const partition = async (arr, left, right, pivot) => {
+    while (left <= right) {
+      while (arr[left] < pivot) {
+        left++;
+      }
+      while (arr[right] > pivot) {
+        right--;
+      }
+
+      if (left <= right) {
+        let bars = document.getElementsByClassName("bar");
+        bars[left].style.backgroundColor = SECONDARY_COLOR;
+        bars[right].style.backgroundColor = SECONDARY_COLOR;
+
+        const temp = arr[left];
+        arr[left] = arr[right];
+        arr[right] = temp;
+
+        setArray([...arr]);
+
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        bars[left].style.backgroundColor = DEFAULT_COLOR;
+        bars[right].style.backgroundColor = DEFAULT_COLOR;
+
+        left++;
+        right--;
+      }
+    }
+
+    return left;
+  };
+
   const stopSorting = () => {
     isCancelled.current = true;
     setSorting(false);
@@ -237,7 +294,7 @@ function AlgorithmVisualizer() {
           Merge Sort
         </button>
         <button
-          onClick={mergeSort}
+          onClick={quickSort}
           disabled={sorting}
           className="px-4 py-2 bg-green-500 rounded hover:bg-green-600 disabled:bg-gray-500"
         >
