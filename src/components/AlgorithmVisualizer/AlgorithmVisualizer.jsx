@@ -2,14 +2,18 @@ import React, { useState, useRef } from "react";
 
 const BASE_COLOR = "rgb(20 184 166)";
 const DEFAULT_COLOR = "teal";
-const SECONDARY_COLOR = "red";
+// const SECONDARY_COLOR = "red";
+const SECONDARY_COLOR = "purple";
+const NEW_ITEM_COLOR = "rgba(0, 0, 128, 0.5)";
+const INSERTED_ITEM_COLOR = "purple";
+
+const TIME_DELAY = 20; // ms
 
 function AlgorithmVisualizer() {
   const [array, setArray] = useState([]);
   const [sorting, setSorting] = useState(false);
   const [time, setTime] = useState(null);
   const isCancelled = useRef(false);
-  let count = 0;
 
   let bars = document.getElementsByClassName("bar");
 
@@ -38,7 +42,6 @@ function AlgorithmVisualizer() {
     for (let i = 0; i < n - 1; i++) {
       for (let j = 0; j < n - i - 1; j++) {
         if (isCancelled.current) {
-          // console.log("Sorting stopped");
           setSorting(false);
           return;
         }
@@ -47,7 +50,7 @@ function AlgorithmVisualizer() {
         bars[j].style.backgroundColor = SECONDARY_COLOR;
         bars[j + 1].style.backgroundColor = SECONDARY_COLOR;
 
-        await new Promise((resolve) => setTimeout(resolve, 2));
+        await new Promise((resolve) => setTimeout(resolve, TIME_DELAY));
 
         if (arr[j] > arr[j + 1]) {
           let temp = arr[j];
@@ -62,6 +65,7 @@ function AlgorithmVisualizer() {
       }
     }
     const time_elapsed = (Date.now() - start_time) / 1000;
+    setTime(time_elapsed);
     setSorting(false);
   };
 
@@ -74,88 +78,67 @@ function AlgorithmVisualizer() {
     let bars = document.getElementsByClassName("bar");
     while (i < mid && j < right) {
       if (isCancelled.current) {
-        // console.log("Sorting stopped");
         setSorting(false);
         return;
       }
 
       if (temp[i] < temp[j]) {
-        while (count > 0);
-        count++;
-
         bars[i].style.backgroundColor = SECONDARY_COLOR;
         arr[k] = temp[i];
         setArray([...arr]);
 
-        await new Promise((resolve) => setTimeout(resolve, 2));
+        await new Promise((resolve) => setTimeout(resolve, TIME_DELAY / 2));
 
         bars[i].style.backgroundColor = DEFAULT_COLOR;
 
         i++;
-        count--;
       } else {
-        while (count > 0);
-        count++;
-
         bars[j].style.backgroundColor = SECONDARY_COLOR;
         arr[k] = temp[j];
         setArray([...arr]);
 
-        await new Promise((resolve) => setTimeout(resolve, 2));
+        await new Promise((resolve) => setTimeout(resolve, TIME_DELAY / 2));
 
         bars[j].style.backgroundColor = DEFAULT_COLOR;
 
         j++;
-        count--;
       }
       k++;
     }
 
     while (i < mid) {
-      while (count > 0);
-      count++;
-
       if (isCancelled.current) {
-        // console.log("Sorting stopped");
         setSorting(false);
         return;
       }
 
-      // bars[i].style.backgroundColor = SECONDARY_COLOR;
       arr[k] = temp[i];
       setArray([...arr]);
 
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, TIME_DELAY / 2));
 
       bars[i].style.backgroundColor = DEFAULT_COLOR;
 
       i++;
       k++;
-      count--;
     }
 
     while (j < right) {
-      while (count > 0);
-      count++;
-
       if (isCancelled.current) {
-        // console.log("Sorting stopped");
         setSorting(false);
         return;
       }
 
       arr[k] = temp[j];
 
-      // bars[j].style.backgroundColor = SECONDARY_COLOR;
       setArray([...arr]);
 
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, TIME_DELAY / 2));
 
       bars[j].style.backgroundColor = DEFAULT_COLOR;
 
       j++;
       k++;
-      count--;
     }
   };
 
@@ -189,9 +172,6 @@ function AlgorithmVisualizer() {
 
     let arr = [...array];
     await quickSortHelper(arr, 0, array.length - 1);
-
-    // setArray(arr);
-    // console.log(arr);
 
     setTime((Date.now() - start_time) / 1000);
 
@@ -230,7 +210,7 @@ function AlgorithmVisualizer() {
 
         setArray([...arr]);
 
-        await new Promise((resolve) => setTimeout(resolve, 20));
+        await new Promise((resolve) => setTimeout(resolve, TIME_DELAY));
         bars[left].style.backgroundColor = DEFAULT_COLOR;
         bars[right].style.backgroundColor = DEFAULT_COLOR;
 
@@ -240,6 +220,51 @@ function AlgorithmVisualizer() {
     }
 
     return left;
+  };
+
+  const insertionSort = async () => {
+    setSorting(true);
+    isCancelled.current = false;
+    const start_time = Date.now();
+
+    let arr = [...array];
+    let newArr = [];
+    let index = 0;
+
+    while (index < arr.length) {
+      if (isCancelled.current) break;
+
+      let i = 0;
+      for (i; i < newArr.length; i++) {
+        if (newArr[i] > arr[index]) break;
+      }
+
+      newArr.splice(i, 0, arr[index]);
+
+      let temp = [...array];
+      temp.splice(0, newArr.length);
+      setArray([...newArr, ...temp]);
+
+      const bars = document.getElementsByClassName("bar");
+
+      // for (let j = 0; j < newArr.length; j++) {
+      //   bars[j].classList.add("new-arr-item");
+      // }
+
+      bars[i].style.backgroundColor = SECONDARY_COLOR;
+
+      await new Promise((resolve) => setTimeout(resolve, TIME_DELAY));
+
+      for (let j = 0; j < newArr.length; j++) {
+        bars[j].classList.remove("new-arr-item");
+        bars[j].style.backgroundColor = DEFAULT_COLOR;
+      }
+
+      index++;
+    }
+    setTime((Date.now() - start_time) / 1000);
+    setSorting(false);
+    resetBarColors();
   };
 
   const stopSorting = () => {
@@ -294,6 +319,13 @@ function AlgorithmVisualizer() {
           className="px-4 py-2 bg-green-500 rounded hover:bg-green-600 disabled:bg-gray-500"
         >
           Quick Sort
+        </button>
+        <button
+          onClick={insertionSort}
+          disabled={sorting}
+          className="px-4 py-2 bg-green-500 rounded hover:bg-green-600 disabled:bg-gray-500"
+        >
+          Insertion Sort
         </button>
         <button
           onClick={stopSorting}
